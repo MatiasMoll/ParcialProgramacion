@@ -23,10 +23,27 @@ class Users{
 
     public static function SigIn($clave, $email){
         $response = false;
-        $newUser = new Users($clave,$email);
-        if(Data::SaveSerialized('users.txt',$newUser)){
+        $lstUsuarios = Data::LoadSerialized('users.txt');
+        if(!$lstUsuarios){
             $response = true;
+        }else{
+            $response = true;
+            foreach($lstUsuarios as $usuario){
+                if(Users::ValidateExistingUser($usuario->email,$usuario->password,$email,$clave)){
+                    $response = false;
+                    break;  
+                }
+            }
         }
+        if($response){
+            $newUser = new Users($clave,$email);
+            if(Data::SaveSerialized('users.txt',$newUser)){
+                $response = "Usuario Creado Correctamente";
+            }
+        }else{
+            $response = "Combinacion ya registrada en el sistema";
+        }
+
         return $response;
     }
 
@@ -42,7 +59,7 @@ class Users{
         $response = Data::LoadSerialized('users.txt');
         $flag = false;
         if($response){
-            $key = "pro3-parcial";
+            $key = 'pro3-parcial';
             foreach ($response as $usuario) {
                if(Users::ValidateExistingUser($usuario->email,$usuario->password,$email,$clave)){
                 $payload = array(

@@ -21,13 +21,10 @@ switch($requestMethod)
             switch($pathInfo)
             {
                 case '/usuario': 
-                    if(isset($_POST['email'])&& isset($_POST['clave'])){
-                        
-                        if(Users::SigIn($_POST['clave'],$_POST['email'])){
-                            echo "Usuario Creado Correctamente";
-                        }else{
-                            echo "Error en los campos";
-                        }
+                    if(isset($_POST['email'])&& isset($_POST['clave'])){                        
+                        echo Users::SigIn($_POST['clave'],$_POST['email']);
+                    }else{
+                        echo "Debe completar ambos campos para registrarse";
                     }
                 break;
                 case '/login':                     
@@ -47,47 +44,60 @@ switch($requestMethod)
                 case '/materia':
                     $cabecera = getallheaders();
                     $response = "Debe ingresar un token valido";
-                    if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
-                        $response = "Debe ingresar tanto nombre como cuatrimestre para crear la materia";
-                        if(isset($_POST['nombre']) && isset($_POST['cuatrimestre'])){
-                            $materiaNueva = new Materia($_POST['nombre'],$_POST['cuatrimestre']);
-                            Data::SaveSerialized('materias.txt',$materiaNueva);                        
-                            $response = "Materia Cargada correctamente";
+                    try{
+                        $aux = JWT::decode($cabecera['token'],'pro3-parcial',array('HS256'));
+                        if(!is_null($aux)){
+                            $response = "Debe ingresar tanto nombre como cuatrimestre para crear la materia";
+                            if(isset($_POST['nombre']) && isset($_POST['cuatrimestre'])){
+                                $materiaNueva = new Materia($_POST['nombre'],$_POST['cuatrimestre']);
+                                Data::SaveSerialized('materias.txt',$materiaNueva);                        
+                                $response = "Materia Cargada correctamente";
+                            }
                         }
+                    }catch (UnexpectedValueException $e){
+                        echo $response.PHP_EOL.$e->getMessage();
                     }
 
-                    echo $response;
+                    
                 break;
                 case '/profesor':
                     $cabecera = getallheaders();
                     $response = "Debe ingresar un token valido";
-                    if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
-                        $response = "Debe completar todos los campos";
-                        if(isset($_POST['nombre'])&&isset($_POST['legajo'])&&isset($_FILES['imagen'])){
-                            if(Profesores::CargarProfesor($_POST['nombre'],$_POST['legajo'],$_FILES['imagen'])){
-                                $response = "Profesor cargado correctamente";
-                            }else{
-                                $response = "Legajo Duplicado";
+                    try{
+                        if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
+                            $response = "Debe completar todos los campos";
+                            if(isset($_POST['nombre'])&&isset($_POST['legajo'])&&isset($_FILES['imagen'])){
+                                if(Profesores::CargarProfesor($_POST['nombre'],$_POST['legajo'],$_FILES['imagen'])){
+                                    $response = "Profesor cargado correctamente";
+                                }else{
+                                    $response = "Legajo Duplicado";
+                                }
+    
                             }
-
                         }
+                    }catch (Exception $e){
+                        echo $response.PHP_EOL.$e->getMessage();
                     }
-                    echo $response;
+
                 break;
                 case'/asignacion':
                     $cabecera = getallheaders();
                     $response = "Debe ingresar un token valido";
-                    if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
-                        $response = "No se pudo cargar la asignacion";
-                        if(isset($_POST['legajo']) && isset($_POST['id']) &&isset($_POST['turno'])){
-                            if(Asignacion::CrearAsignacion($_POST['legajo'],$_POST['id'],$_POST['turno'])){
-                                $response = "Asignacion creada correctamente";
-                            }else{
-                                $response = "Legajo o Materia no encontrada";
+                    try{
+                        if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
+                            $response = "No se pudo cargar la asignacion";
+                            if(isset($_POST['legajo']) && isset($_POST['id']) &&isset($_POST['turno'])){
+                                if(Asignacion::CrearAsignacion($_POST['legajo'],$_POST['id'],$_POST['turno'])){
+                                    $response = "Asignacion creada correctamente";
+                                }else{
+                                    $response = "Legajo o Materia no encontrada";
+                                }
                             }
                         }
+                    }catch (Exception $e){
+                        echo $response.PHP_EOL.$e->getMessage();
                     }
-                    echo $response;
+
                 break;
             }   
     break;
@@ -96,23 +106,38 @@ switch($requestMethod)
         case '/materia':
             $cabecera = getallheaders();
             $response = "Debe ingresar un token valido";
-            if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
-                echo Materia::ListarMaterias();
+            try{
+                if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
+                    echo Materia::ListarMaterias();
+                }
+            }catch (Exception $e){
+                echo $response.PHP_EOL.$e->getMessage();
             }
+
         break;
         case '/profesor': 
             $cabecera = getallheaders();
             $response = "Debe ingresar un token valido";
-            if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
-                echo Profesores::ListarProfesores();
+            try{
+                if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
+                    echo Profesores::ListarProfesores();
+                }
+            }catch (Exception $e){
+                echo $response.PHP_EOL.$e->getMessage();
             }
+
         break;
         case '/asignacion':
             $cabecera = getallheaders();
             $response = "Debe ingresar un token valido";
-            if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
-                echo Asignacion::MostrarAsignacion();
+            try{
+                if(!is_null(JWT::decode($cabecera['token'],'pro3-parcial',array('HS256')))){
+                    echo Asignacion::MostrarAsignacion();
+                }
+            }catch (Exception $e){
+                echo $response.PHP_EOL.$e->getMessage();
             }
+
         break;
     }       
 
