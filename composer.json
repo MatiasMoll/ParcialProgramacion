@@ -1,0 +1,12 @@
+{
+    "name": "bangho/primer-parcial",
+    "authors": [
+        {
+            "name": "MatiasMoll",
+            "email": "moll.matias.a@gmail.com"
+        }
+    ],
+    "require": {
+        "firebase/php-jwt": "^5.2"
+    }
+}
