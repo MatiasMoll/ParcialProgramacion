@@ -42,7 +42,7 @@ class Asignacion{
         $respuesta = Data::LoadSerialized('materias-profesores.txt');
         $rta = 'Asignaciones y sus Profesores: '.PHP_EOL;
         if(!$respuesta){
-            $respuesta = "No se han cargado asignaciones  todavia";
+            $respuesta = "No se han cargado asignaciones todavia";
         }else{
             foreach ($respuesta as  $materia) {
                 $profe = Profesores::BuscarProfesor($materia->legajoProfesor);
