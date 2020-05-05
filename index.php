@@ -55,7 +55,7 @@ switch($requestMethod)
                             }
                         }
                     }catch (UnexpectedValueException $e){
-                        echo $response.PHP_EOL.$e->getMessage();
+                        echo $response;
                     }
 
                     
